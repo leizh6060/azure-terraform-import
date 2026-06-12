@@ -2,7 +2,7 @@
 # The 'id' should be the Azure Resource ID of the existing resource
 import {
   to = azurerm_resource_group.imported_rg
-  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${var.resource_group_name}"
+  id = "/subscriptions/af71ded2-458b-4260-9071-82709c4c2107/resourceGroups/MyResourceGroupByTerreform"
 }
 
 resource "azurerm_resource_group" "imported_rg" {
@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "imported_rg" {
 # Example of importing a Virtual Network
 import {
   to = azurerm_virtual_network.imported_vnet
-  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${var.resource_group_name}/providers/Microsoft.Network/virtualNetworks/existing-vnet-name"
+  id = "/subscriptions/af71ded2-458b-4260-9071-82709c4c2107/resourceGroups/MyResourceGroupByTerreform/providers/Microsoft.Network/virtualNetworks/LeiVnetFromPilot"
 }
 
 resource "azurerm_virtual_network" "imported_vnet" {
