@@ -49,6 +49,10 @@ jobs:
           echo "Ensuring Container $CONTAINER_NAME exists..."
           az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
 
+          # Break any existing lease on the state file to prevent 412 errors
+          echo "Breaking existing lease on terraform.tfstate if it exists..."
+          az storage blob lease break --account-name $STORAGE_ACCOUNT_NAME --container-name $CONTAINER_NAME --blob-name terraform.tfstate || echo "No lease to break"
+
           # Export these for the next steps
           echo "BACKEND_RG=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
           echo "BACKEND_STORAGE=$STORAGE_ACCOUNT_NAME" >> $GITHUB_ENV
