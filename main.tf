@@ -2,18 +2,18 @@
 # The 'id' should be the Azure Resource ID of the existing resource
 import {
   to = azurerm_resource_group.imported_rg
-  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg-name"
+  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${var.resource_group_name}"
 }
 
 resource "azurerm_resource_group" "imported_rg" {
-  name     = "existing-rg-name"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Example of importing a Virtual Network
 import {
   to = azurerm_virtual_network.imported_vnet
-  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg-name/providers/Microsoft.Network/virtualNetworks/existing-vnet-name"
+  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${var.resource_group_name}/providers/Microsoft.Network/virtualNetworks/existing-vnet-name"
 }
 
 resource "azurerm_virtual_network" "imported_vnet" {
