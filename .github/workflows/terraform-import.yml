@@ -71,11 +71,11 @@ jobs:
             -backend-config="container_name=${{ env.BACKEND_CONTAINER }}"
 
       - name: Terraform Plan
-        run: terraform plan -input=false -no-color -lock=false -out=tfplan
+        run: terraform plan -input=false -no-color -lock=false -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP }}" -var="vnet_name=${{ secrets.AZURE_VNET_NAME }}" -out=tfplan
 
       - name: Terraform Apply
         # This will finalize the import of resources into the state file.
         # We use -lock=false here because orphaned locks from previous 
         # cancelled CI runs can block the import process.
-        run: terraform apply -input=false -no-color -lock=false "tfplan"
+        run: terraform apply -input=false -no-color -lock=false -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP }}" -var="vnet_name=${{ secrets.AZURE_VNET_NAME }}" "tfplan"
 

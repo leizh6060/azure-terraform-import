@@ -1,7 +1,16 @@
+variable "subscription_id" {
+  description = "Azure Subscription ID"
+  type        = string
+}
+
 variable "resource_group_name" {
   description = "Name of the existing resource group to import"
   type        = string
-  default     = "existing-rg-name"
+}
+
+variable "vnet_name" {
+  description = "Name of the existing Virtual Network to import"
+  type        = string
 }
 
 variable "location" {
