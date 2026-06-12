@@ -68,3 +68,9 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -input=false -no-color -lock=false -out=tfplan
+
+      - name: Terraform Apply
+        # This will finalize the import of resources into the state file.
+        # We use the plan file generated in the previous step.
+        run: terraform apply -input=false -no-color "tfplan"
+
