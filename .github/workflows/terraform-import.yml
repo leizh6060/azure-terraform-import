@@ -67,4 +67,4 @@ jobs:
             -backend-config="container_name=${{ env.BACKEND_CONTAINER }}"
 
       - name: Terraform Plan
-        run: terraform plan -input=false -no-color -out=tfplan
+        run: terraform plan -input=false -no-color -lock=false -out=tfplan
