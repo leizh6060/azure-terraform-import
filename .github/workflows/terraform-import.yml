@@ -24,16 +24,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Azure Login
+        run: az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+
+      - name: Bootstrap Backend
+        shell: bash
+        run: |
+          # Use a unique name for storage account based on the repository name
+          # GitHub repository names are lowercase, alphanumeric, and hyphens
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
+          STORAGE_ACCOUNT_NAME="tfstate${REPO_NAME}"
+          RESOURCE_GROUP_NAME="tfstate-rg"
+          CONTAINER_NAME="tfstate"
+
+          echo "Ensuring Resource Group $RESOURCE_GROUP_NAME exists..."
+          az group create --name $RESOURCE_GROUP_NAME --location eastus
+
+          echo "Ensuring Storage Account $STORAGE_ACCOUNT_NAME exists..."
+          # Storage account names must be 3-24 characters, lowercase and numbers only
+          # We trim the name to 24 characters max
+          STORAGE_ACCOUNT_NAME=$(echo $STORAGE_ACCOUNT_NAME | cut -c 1-24)
+          az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP_NAME --location eastus --sku Standard_LRS
+
+          echo "Ensuring Container $CONTAINER_NAME exists..."
+          az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+
+          # Export these for the next steps
+          echo "BACKEND_RG=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
+          echo "BACKEND_STORAGE=$STORAGE_ACCOUNT_NAME" >> $GITHUB_ENV
+          echo "BACKEND_CONTAINER=$CONTAINER_NAME" >> $GITHUB_ENV
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.0
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.BACKEND_RG }}" \
+            -backend-config="storage_account_name=${{ env.BACKEND_STORAGE }}" \
+            -backend-config="container_name=${{ env.BACKEND_CONTAINER }}"
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        # In a real scenario, if import blocks are used, 
-        # terraform plan will show that resources need to be imported 
-        # into the state before they can be managed.
